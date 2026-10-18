@@ -33,7 +33,7 @@ namespace TARge25Shop.ApplicationServices.Services
             spaceShip.Id = Guid.NewGuid();
             spaceShip.Name = dto.Name;
             spaceShip.ShipType = dto.ShipType;
-            spaceShip.Crew = dto.Crew; 
+            spaceShip.Crew = dto.Crew;
             spaceShip.EnginePower = dto.EnginePower;
             spaceShip.CreatedAt = DateTime.Now;
             spaceShip.UpdatedAt = DateTime.Now;
@@ -52,6 +52,7 @@ namespace TARge25Shop.ApplicationServices.Services
             {
                 spaceShip.EnginePower = 1;
             }
+
             //andmete salvestamine andmebaasi
             _context.Spaceships.Add(spaceShip);
             await _context.SaveChangesAsync();
@@ -71,7 +72,7 @@ namespace TARge25Shop.ApplicationServices.Services
             spaceShip.ShipType = dto.ShipType;
             spaceShip.Crew = dto.Crew;
             spaceShip.EnginePower = dto.EnginePower;
-            spaceShip.CreatedAt = dto.CreatedAt;
+            spaceShip.CreatedAt = (DateTime)dto.CreatedAt;
             spaceShip.UpdatedAt = DateTime.Now;
 
             //andmete uuendamine andmebaasis
