@@ -1,0 +1,12 @@
+﻿@model TARge25Shop.Models.Kindergarden.KindergardenImageViewModel
+
+<div class="form-group row col-sm-4 offset-2">
+    <div>@Model.ImageTitle</div>
+
+    @if (Model.ImageData != null && Model.ImageData.Length > 0)
+    {
+        <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)"
+             class="card-img-top"
+             alt="@Model.ImageTitle" />
+    }
+</div>

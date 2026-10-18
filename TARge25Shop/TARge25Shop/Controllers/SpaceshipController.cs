@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using TARge25Shop.Core.Dto;
 using TARge25Shop.Core.ServiceInterface;
 using TARge25Shop.Data;
@@ -12,11 +11,9 @@ namespace TARge25Shop.Controllers
         private readonly ISpaceshipServices _spaceshipServices;
         private readonly TARge25ShopContext _context;
 
-        public SpaceshipController
-            (
-                ISpaceshipServices spaceshipServices,
-                TARge25ShopContext context
-            )
+        public SpaceshipController(
+            ISpaceshipServices spaceshipServices,
+            TARge25ShopContext context)
         {
             _spaceshipServices = spaceshipServices;
             _context = context;
@@ -24,10 +21,6 @@ namespace TARge25Shop.Controllers
 
         public IActionResult Index()
         {
-
-            // Kutsume teenuse välja, et saada kõik kosmoselaevad. 
-            //constructoris tuleb välja kutsuda DbContext, et
-            //saaksime andmeid kätte.
             var result = _context.Spaceships
                 .Select(x => new SpaceshipIndexViewModel
                 {
@@ -52,32 +45,24 @@ namespace TARge25Shop.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SpaceshipCreateUpdateViewModel vm)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("CreateUpdate", vm);
+            }
+
             var dto = new SpaceshipDto
             {
                 Name = vm.Name,
                 ShipType = vm.ShipType,
                 Crew = vm.Crew,
-                EnginePower = vm.EnginePower,
-                //failide edasiandmine dto-le
-                Files = vm.Files,
-                FileToApiDtos = vm.Image
-                    .Select(x => new FileToApiDto
-                    {
-                        Id = x.ImageId,
-                        ExistingFilePath = x.FilePath,
-                        SpaceshipId = x.SpaceshipId
-                    }).ToArray()
+                EnginePower = vm.EnginePower
             };
 
-            //Nüüd kutsume teenuse välja, et luua uus kosmoselaev. See on
-            //asünkroonne tegevus ja kasutame await.
             var result = await _spaceshipServices.Create(dto);
 
             if (result == null)
             {
-                // Kui kosmoselaeva loomine ebaõnnestus, siis võime kuvada veateate
-                // ja jätta kasutaja samale lehele.
-                return RedirectToAction(nameof(Index));
+                return View("CreateUpdate", vm);
             }
 
             return RedirectToAction(nameof(Index));
@@ -110,7 +95,12 @@ namespace TARge25Shop.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(SpaceshipCreateUpdateViewModel vm)
         {
-            var dto = new SpaceshipDto()
+            if (!ModelState.IsValid)
+            {
+                return View("CreateUpdate", vm);
+            }
+
+            var dto = new SpaceshipDto
             {
                 Id = vm.Id,
                 Name = vm.Name,
@@ -125,7 +115,7 @@ namespace TARge25Shop.Controllers
 
             if (result == null)
             {
-                return RedirectToAction(nameof(Index));
+                return View("CreateUpdate", vm);
             }
 
             return RedirectToAction(nameof(Index));
@@ -141,25 +131,16 @@ namespace TARge25Shop.Controllers
                 return NotFound();
             }
 
-            var images = await _context.FileToApis
-                .Where(x => x.SpaceshipId == id)
-                .Select(y => new ImageViewModel
-                {
-                    FilePath = y.ExistingFilePath,
-                    ImageId = y.Id
-                }).ToArrayAsync();
-
-            //see on vaheinstants domaini ja vm vahel
-            var vm = new SpaceshipDeleteViewModel();
-
-            vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.ShipType = spaceship.ShipType;
-            vm.Crew = spaceship.Crew;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.UpdatedAt = spaceship.UpdatedAt;
-            vm.Image.AddRange(images);
+            var vm = new SpaceshipDeleteViewModel
+            {
+                Id = spaceship.Id,
+                Name = spaceship.Name,
+                ShipType = spaceship.ShipType,
+                Crew = spaceship.Crew,
+                EnginePower = spaceship.EnginePower,
+                CreatedAt = spaceship.CreatedAt,
+                UpdatedAt = spaceship.UpdatedAt
+            };
 
             return View(vm);
         }
@@ -178,7 +159,6 @@ namespace TARge25Shop.Controllers
         }
 
         [HttpGet]
-        //teha Detaili vaate meetod
         public async Task<IActionResult> Details(Guid id)
         {
             var spaceship = await _spaceshipServices.DetailAsync(id);
@@ -188,26 +168,16 @@ namespace TARge25Shop.Controllers
                 return NotFound();
             }
 
-            var images = await _context.FileToApis
-                .Where(x => x.SpaceshipId == id)
-                .Select(y => new ImageViewModel
-                {
-                    FilePath = y.ExistingFilePath,
-                    ImageId = y.Id
-                }).ToArrayAsync();
-
-            //tuleb kasutada AddRange, et saada pildid vm kaasa
-            //see on vaheinstants domaini ja vm vahel
-            var vm = new SpaceshipDetailsViewModel();
-
-            vm.Id = spaceship.Id;
-            vm.Name = spaceship.Name;
-            vm.ShipType = spaceship.ShipType;
-            vm.Crew = spaceship.Crew;
-            vm.EnginePower = spaceship.EnginePower;
-            vm.CreatedAt = spaceship.CreatedAt;
-            vm.UpdatedAt = spaceship.UpdatedAt;
-            vm.Image.AddRange(images);
+            var vm = new SpaceshipDetailsViewModel
+            {
+                Id = spaceship.Id,
+                Name = spaceship.Name,
+                ShipType = spaceship.ShipType,
+                Crew = spaceship.Crew,
+                EnginePower = spaceship.EnginePower,
+                CreatedAt = spaceship.CreatedAt,
+                UpdatedAt = spaceship.UpdatedAt
+            };
 
             return View(vm);
         }

@@ -54,14 +54,9 @@
         </div>
     </dl>
 
-    @foreach (var images in Model.Image)
-    {
-        <partial name="_Images" model="images" />
-    }
-
     <form asp-action="DeleteConfirmation">
         <input type="hidden" asp-for="Id" />
-        <input id="Delete_Delete" type="submit" value="Delete" class="btn btn-danger" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
         <a asp-action="Index" asp-controller="spaceship" class="btn btn-success">Back</a>
     </form>
 </div>
