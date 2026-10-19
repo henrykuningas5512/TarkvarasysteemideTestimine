@@ -54,6 +54,8 @@ namespace TARge25Shop.SeleniumTesting
     [TestCaseOrderer("TARge25Shop.SeleniumTesting.PriorityOrderer", "TARge25Shop.SeleniumTesting")]
     public class SpaceshipFrontendTests
     {
+        public static string thisRunGuid { get; set; }
+
         [Fact]
         [Order(1)] //järjesti millel on väärtus "1", järjestatakse väiksem enne.
         public void Should_NavigateToCreate_AddSpaceShip_WithCorrectData_ReturnToIndex()
@@ -108,13 +110,16 @@ namespace TARge25Shop.SeleniumTesting
             //Thread.Sleep(1000);
 
             //andmete kogumine pärast reloadi
-            IWebElement indexNameSpaceship = driver.FindElement(By.Id("IndexNameSpaceship"));
-            var spaceShipNameData = indexNameSpaceship.Text;
-            IWebElement indexTypeSpaceship = driver.FindElement(By.Id("IndexTypeSpaceship"));
-            var spaceShipTypeData = indexTypeSpaceship.Text;
-            IWebElement indexCrewSpaceship = driver.FindElement(By.Id("IndexCrewSpaceship"));
-            var spaceShipCrewData = indexCrewSpaceship.Text;
-            bool doesItExist = false;
+            var tableOfIndex = driver.FindElement(By.Id("IndexTable"));
+            List<IWebElement> rowsOfTable = tableOfIndex.FindElements(By.TagName("tr")).ToList();
+            rowsOfTable.RemoveAt(0);
+            //IWebElement indexNameSpaceship = driver.FindElement(By.Id("IndexNameSpaceship"));
+            //var spaceShipNameData = indexNameSpaceship.Text;
+            //IWebElement indexTypeSpaceship = driver.FindElement(By.Id("IndexTypeSpaceship"));
+            //var spaceShipTypeData = indexTypeSpaceship.Text;
+            //IWebElement indexCrewSpaceship = driver.FindElement(By.Id("IndexCrewSpaceship"));
+            //var spaceShipCrewData = indexCrewSpaceship.Text;
+            //bool doesItExist = false;
 
             //otsi kõik read,
             var table = driver.FindElement(By.Id("IndexTable"));
